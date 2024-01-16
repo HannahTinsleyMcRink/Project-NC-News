@@ -7,7 +7,7 @@ exports.getTopics = (request, response) => {
 }
 
 exports.getEndpoints = (request, response) => {
-    fetchEndpoints().then((data) => {
-        response.status(200).send(data)
+    fetchEndpoints().then((endpoints) => {
+        response.status(200).send(endpoints)
     })
 }
