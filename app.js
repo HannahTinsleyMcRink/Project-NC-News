@@ -13,7 +13,6 @@ app.use((err, request, response, next) => {
         next(err)
     }
 })
-
 app.use((err, request, response, next) => {
     if (err.message === "Not Found") {
         response.status(404).send({message: err.message})
