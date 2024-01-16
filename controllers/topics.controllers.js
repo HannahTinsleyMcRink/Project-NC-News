@@ -1,7 +1,13 @@
-const {fetchTopics} = require('../models/topics.models')
+const {fetchTopics, fetchEndpoints} = require('../models/topics.models')
 
-module.exports.getTopics = (request, response) => {
+exports.getTopics = (request, response) => {
     fetchTopics().then((topics) => {
         response.status(200).send({topics})
+    })
+}
+
+exports.getEndpoints = (request, response) => {
+    fetchEndpoints().then((data) => {
+        response.status(200).send(data)
     })
 }
