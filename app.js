@@ -1,10 +1,11 @@
-const {getTopics, getEndpoints, getArticlesByID} = require("./controllers/topics.controllers")
+const {getTopics, getEndpoints, getArticlesByID, getArticles} = require("./controllers/topics.controllers")
 const express = require("express")
 const app = express()
 
 app.get('/api/topics', getTopics)
 app.get('/api', getEndpoints)
 app.get('/api/articles/:article_id', getArticlesByID)
+app.get('/api/articles', getArticles)
 
 app.use((err, request, response, next) => {
     if (err.code === '22P02') {
