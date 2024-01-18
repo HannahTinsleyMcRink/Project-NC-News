@@ -5,6 +5,7 @@ const {
   getArticles,
   getArticleComments,
   postArticleComment,
+  patchArticleVote,
 } = require("./controllers/topics.controllers");
 const express = require("express");
 const app = express();
@@ -16,6 +17,7 @@ app.get("/api/articles/:article_id", getArticlesByID);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postArticleComment);
+app.patch("/api/articles/:article_id", patchArticleVote);
 
 app.use((err, request, response, next) => {
   if (err.code === "22P02") {

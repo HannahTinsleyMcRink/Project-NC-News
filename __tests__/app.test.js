@@ -86,6 +86,66 @@ describe("/api/articles/:article_id", () => {
         });
     });
   });
+  describe("PATCH", () => {
+    test("status: 200 responds with article with updated vote", () => {
+      const updateVote = {
+        inc_votes: 1,
+      };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(updateVote)
+        .expect(200)
+        .then((response) => {
+          const updatedVotes = response.body.updatedVote;
+          console.log(updatedVotes, "<-- res.body in test");
+          expect(typeof updatedVotes).toBe("object");
+          expect(updatedVotes.votes).toBe(101);
+          expect(updatedVotes.article_id).toBe(1);
+          expect.objectContaining({ title: expect.any(String) });
+          expect.objectContaining({ topic: expect.any(String) });
+          expect.objectContaining({ author: expect.any(String) });
+          expect.objectContaining({ body: expect.any(String) });
+          expect.objectContaining({ created_at: expect.any(String) });
+          expect.objectContaining({ article_img_url: expect.any(String) });
+        });
+    });
+    test("status: 404 responds with appropriate message when provided with non existent article id", () => {
+      const updateVote = {
+        inc_votes: 1,
+      };
+      return request(app)
+        .patch("/api/articles/10000")
+        .send(updateVote)
+        .expect(404)
+        .then(({ body: { message } }) => {
+          expect(message).toBe("Not Found");
+        });
+    });
+    test("status: 400 responds with appropriate message when provided with invalid article id", () => {
+      const updateVote = {
+        inc_votes: 1,
+      };
+      return request(app)
+        .patch("/api/articles/nonsense")
+        .send(updateVote)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toBe("Bad Request");
+        });
+    });
+    test("status: 400 responds with appropriate message when provided with invalid vote", () => {
+      const updateVote = {
+        inc_votes: "not a vote",
+      };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(updateVote)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toBe("Bad Request");
+        });
+    });
+  });
 });
 
 describe("/api/articles", () => {
@@ -183,11 +243,11 @@ describe("/api/articles/:article_id/comments", () => {
         .then((response) => {
           expect(typeof response.body).toBe("object");
           expect(response.body.comment.body).toBe("test comment 1");
-          expect(response.body.comment.author).toBe("butter_bridge")
-          expect(response.body.comment.article_id).toBe(3)
-          expect(typeof response.body.comment.comment_id).toBe("number")
-          expect(typeof response.body.comment.votes).toBe("number")
-          expect(typeof response.body.comment.created_at).toBe("string")
+          expect(response.body.comment.author).toBe("butter_bridge");
+          expect(response.body.comment.article_id).toBe(3);
+          expect(typeof response.body.comment.comment_id).toBe("number");
+          expect(typeof response.body.comment.votes).toBe("number");
+          expect(typeof response.body.comment.created_at).toBe("string");
         });
     });
     test("status: 404 responds with appropriate message when provided with non existent username", () => {
