@@ -1,5 +1,6 @@
 const db = require('../db/connection')
 const fs = require('fs/promises')
+const format = require('pg-format')
 
 exports.fetchTopics = () => {
     return db
@@ -42,6 +43,15 @@ exports.fetchArticleComments = (article_id) => {
             return Promise.reject({status: 404, message: "Not Found"})
         }
         return rows
+    })
+}
+exports.addComment = (newComment, article_id) => {
+    const { username, body } = newComment
+    const databaseQuery = format(`INSERT INTO comments (author, body, article_id) VALUES %L RETURNING *`, [[username, body, article_id]])
+    return db
+    .query(databaseQuery)
+    .then(({rows}) => {
+        return rows[0]
     })
 }
 
