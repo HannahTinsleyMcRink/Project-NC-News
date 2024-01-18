@@ -97,7 +97,6 @@ describe("/api/articles/:article_id", () => {
         .expect(200)
         .then((response) => {
           const updatedVotes = response.body.updatedVote;
-          console.log(updatedVotes, "<-- res.body in test");
           expect(typeof updatedVotes).toBe("object");
           expect(updatedVotes.votes).toBe(101);
           expect(updatedVotes.article_id).toBe(1);
