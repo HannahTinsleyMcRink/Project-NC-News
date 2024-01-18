@@ -170,4 +170,72 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
   });
+  describe("POST", () => {
+    test("status: 201 inserts a new comment to an article with correct properties", () => {
+      const newComment = {
+        username: "butter_bridge",
+        body: "test comment 1",
+      };
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+          expect(typeof response.body).toBe("object");
+          expect(response.body.comment.body).toBe("test comment 1");
+          expect(response.body.comment.author).toBe("butter_bridge")
+          expect(response.body.comment.article_id).toBe(3)
+          expect(typeof response.body.comment.comment_id).toBe("number")
+          expect(typeof response.body.comment.votes).toBe("number")
+          expect(typeof response.body.comment.created_at).toBe("string")
+        });
+    });
+    test("status: 404 responds with appropriate message when provided with non existent username", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "not a username",
+          body: "test comment 1",
+        })
+        .expect(404)
+        .then(({ body: { message } }) => {
+          expect(message).toBe("Not Found");
+        });
+    });
+    test("status: 404 responds with appropriate message when provided with non existent article id", () => {
+      return request(app)
+        .post("/api/articles/10000/comments")
+        .send({
+          username: "butter_bridge",
+          body: "test comment 1",
+        })
+        .expect(404)
+        .then(({ body: { message } }) => {
+          expect(message).toBe("Not Found");
+        });
+    });
+    test("status: 400 responds with appropriate message when provided with no body key", () => {
+      return request(app)
+        .post("/api/articles/10000/comments")
+        .send({
+          username: "butter_bridge",
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toBe("Bad Request");
+        });
+    });
+    test("status: 400 responds with appropriate message when provided with invalid article id", () => {
+      return request(app)
+        .post("/api/articles/nonsense/comments")
+        .send({
+          username: "butter_bridge",
+          body: "test comment 1",
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toBe("Bad Request");
+        });
+    });
+  });
 });
