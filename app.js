@@ -7,6 +7,7 @@ const {
   postArticleComment,
   patchArticleVote,
   deleteComment,
+  getUsers
 } = require("./controllers/topics.controllers");
 const express = require("express");
 const app = express();
@@ -20,11 +21,13 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postArticleComment);
 app.patch("/api/articles/:article_id", patchArticleVote);
 app.delete("/api/comments/:comment_id", deleteComment)
+app.get("/api/users", getUsers)
 
 app.use((err, request, response, next) => {
   if (err.code === "22P02") {
     response.status(400).send({ message: "Bad Request" });
   } else if (err.code === "23503") {
+    console.log(err.code)
     response.status(404).send({ message: "Not Found" });
   } else if (err.code === "23502") {
     response.status(400).send({ message: "Bad Request" });
