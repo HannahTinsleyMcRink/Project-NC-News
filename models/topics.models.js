@@ -31,18 +31,40 @@ exports.fetchArticlesByID = (article_id) => {
 //         return rows;
 //       });
 //   };
-exports.fetchArticles = (articleTopic) => {
+exports.fetchArticles = (query) => {
+    const topic = query.topic
+    const validTopics = ["mitch", "cats", "paper", undefined]
+    if (Object.keys(query).length !== 0) {
+        if (!Object.keys(query).includes("topic")) {
+            Promise.reject({ status: 404, message: "To be sorted (query invalid)" })
+        }
+    }
+    if (!validTopics.includes(topic)) {
+        Promise.reject({ status: 404, message: "To be sorted (topic invalid)" })
+    }
+    let queryString = `SELECT
+    author,
+    title,
+    article_id,
+    topic,
+    created_at,
+    votes,
+    article_img_url,
+    CAST
+    ((SELECT COUNT(*)
+    FROM comments
+    WHERE articles.article_id=comments.article_id) AS INTEGER)
+    AS comment_count
+    FROM articles `;
+
+    if (!topic) {
+        queryString += `ORDER BY created_at DESC`
+    } else {
+        queryString += format(`WHERE topic = %L ORDER BY created_at DESC`, topic)
+    }
+
   return db
-    .query(
-      `SELECT author, title, article_id, topic, created_at, votes, article_img_url,
-      CAST((
-        SELECT COUNT(article_id) AS comment_count 
-        FROM comments 
-        WHERE comments.article_id = articles.article_id) AS INTEGER)
-      FROM articles
-      WHERE topic = $1 
-      ORDER BY created_at DESC`, [articleTopic]
-    )
+    .query(queryString)
     .then(({ rows }) => {
         console.log(rows, "<-- rows in models")
       return rows;

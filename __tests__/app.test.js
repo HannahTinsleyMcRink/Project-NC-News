@@ -149,7 +149,7 @@ describe("/api/articles/:article_id", () => {
 
 describe("/api/articles", () => {
   describe("GET", () => {
-    test.skip("status: 200 responds with array of articles objects with correct properties", () => {
+    test("status: 200 responds with array of articles objects with correct properties", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)

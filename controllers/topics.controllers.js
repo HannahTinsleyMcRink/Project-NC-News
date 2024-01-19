@@ -8,7 +8,7 @@ const {
   addVote,
   removeComment,
   fetchUsers,
-  fetchArticleTopic
+  fetchArticleTopic,
 } = require("../models/topics.models");
 
 exports.getTopics = (request, response, next) => {
@@ -49,18 +49,28 @@ exports.getArticlesByID = (request, response, next) => {
 //     });
 // };
 exports.getArticles = (request, response, next) => {
-  const articleTopic = request.query.topic;
-  console.log(articleTopic, "<--topic in controller")
-  fetchArticles(articleTopic)
-    .then((articles) => {
-      console.log(articles, "<--articles in controller")
-      response.status(200).send({ articles });
-    })
-    .catch((err) => {
-      console.log(err, "<-- err in controller")
-      next(err);
-    });
-};
+  const query = request.query
+  console.log(query)
+  fetchArticles(query)
+  // if (request.query.articleTopic) {
+  //   const articleTopic = request.query.topic;
+  //   //console.log(articleTopic, "<--topic in controller");
+  //   fetchArticles(articleTopic).then((articles) => {
+  //     //console.log(articles, "<--articles in controller");
+  //     response.status(200).send({ articles });
+  //   });
+  // } else {
+  //   fetchArticles()
+      .then((articles) => {
+        response.status(200).send({ articles });
+      })
+      .catch((err) => {
+        //console.log(err, "<-- err in controller");
+        next(err);
+      });
+  }
+//};
+
 exports.getArticleComments = (request, response, next) => {
   const { article_id } = request.params;
   fetchArticleComments(article_id)
@@ -108,4 +118,3 @@ exports.getUsers = (request, response, next) => {
       next(err);
     });
 };
-
