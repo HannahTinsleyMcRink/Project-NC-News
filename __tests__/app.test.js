@@ -97,7 +97,6 @@ describe("/api/articles/:article_id", () => {
         .expect(200)
         .then((response) => {
           const updatedVotes = response.body.updatedVote;
-          console.log(updatedVotes, "<-- res.body in test");
           expect(typeof updatedVotes).toBe("object");
           expect(updatedVotes.votes).toBe(101);
           expect(updatedVotes.article_id).toBe(1);
@@ -292,6 +291,34 @@ describe("/api/articles/:article_id/comments", () => {
           username: "butter_bridge",
           body: "test comment 1",
         })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toBe("Bad Request");
+        });
+    });
+  });
+});
+describe("/api/comments/comment_id", () => {
+  describe("DELETE", () => {
+    test("status: 204 deletes comment by comment id", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+        .then(({body}) => {
+          expect(body).toEqual({});
+        });
+    });
+    test("status: 404 responds with appropriate message when provided with non existent comment id", () => {
+      return request(app)
+        .delete("/api/comments/10000")
+        .expect(404)
+        .then(({ body: { message } }) => {
+          expect(message).toBe("Not Found");
+        });
+    });
+    test("status: 400 responds with appropriate message when provided with invalid comment id", () => {
+      return request(app)
+        .delete("/api/comments/nonsense")
         .expect(400)
         .then((response) => {
           expect(response.body.message).toBe("Bad Request");
