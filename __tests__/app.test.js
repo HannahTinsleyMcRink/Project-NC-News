@@ -298,7 +298,7 @@ describe("/api/articles/:article_id/comments", () => {
     });
   });
 });
-describe("/api/comments/comment_id", () => {
+describe("/api/comments/:comment_id", () => {
   describe("DELETE", () => {
     test("status: 204 deletes comment by comment id", () => {
       return request(app)
@@ -322,6 +322,26 @@ describe("/api/comments/comment_id", () => {
         .expect(400)
         .then((response) => {
           expect(response.body.message).toBe("Bad Request");
+        });
+    });
+  });
+});
+
+describe("/api/users", () => {
+  describe("GET", () => {
+    test("status: 200 responds with array of user objects with correct properties", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          const { users } = body;
+          expect(Array.isArray(users)).toBe(true);
+          expect(users.length).toBeGreaterThan(0);
+          users.forEach((user) => {
+            expect(typeof user.username).toBe("string");
+            expect(typeof user.name).toBe("string");
+            expect(typeof user.avatar_url).toBe("string");
+          });
         });
     });
   });
