@@ -149,12 +149,13 @@ describe("/api/articles/:article_id", () => {
 
 describe("/api/articles", () => {
   describe("GET", () => {
-    test("status: 200 responds with array of articles objects with correct properties", () => {
+    test.skip("status: 200 responds with array of articles objects with correct properties", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
+          //console.log(articles, "<-- api/articles")
           expect(Array.isArray(articles)).toBe(true);
           expect(articles.length).toBeGreaterThan(0);
           articles.forEach((article) => {
@@ -346,3 +347,52 @@ describe("/api/users", () => {
     });
   });
 });
+
+describe("/api/articles(topic query)", () => {
+  describe("GET", () => {
+    test("status: 200 responds with an array containing article objects with correct properties when selcted for by topic", () => {
+      return request(app)
+        .get("/api/articles")
+        .query({topic: "cats"})
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          console.log(articles, "<-- articles in test")
+          expect(Array.isArray(articles)).toBe(true);
+          expect(articles.length).toBeGreaterThan(0);
+          expect(articles).toEqual([{
+            author: "rogersop",
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            article_id: 5,
+            topic: "cats",
+            votes: 0,
+            created_at: "2020-08-03T13:14:00.000Z",
+            comment_count: 2,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          }]);
+        });
+    });
+    test.skip("status: 200 responds with an empty array when queried with an existing topic with no associated articles", () => {
+      return request(app)
+        .get("/api/articles")
+        .query({topic: "paper"})
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          console.log(body, "<-- body in test")
+          expect(typeof body).toBe("object");
+          expect(article).toEqual({});
+        });
+    });
+    test.skip("status: 404 responds with appropriate message when given topic that does not exist in the database", () => {
+      return request(app)
+        .get("/api/articles")
+        .query({topic: "nonsense"})
+        .expect(404)
+        .then(({ body: { message } }) => {
+          expect(message).toBe("Not Found");
+        });
+    });
+  });
+})

@@ -22,15 +22,47 @@ exports.fetchArticlesByID = (article_id) => {
       return rows[0];
     });
 };
-exports.fetchArticles = () => {
+// exports.fetchArticles = () => {
+//     return db
+//       .query(
+//         `SELECT author, title, article_id, topic, created_at, votes, article_img_url,CAST((SELECT COUNT(article_id) AS comment_count FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) FROM articles ORDER BY created_at DESC`
+//       )
+//       .then(({ rows }) => {
+//         return rows;
+//       });
+//   };
+exports.fetchArticles = (articleTopic) => {
   return db
     .query(
-      `SELECT author, title, article_id, topic, created_at, votes, article_img_url,CAST((SELECT COUNT(article_id) AS comment_count FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) FROM articles ORDER BY created_at DESC`
+      `SELECT author, title, article_id, topic, created_at, votes, article_img_url,
+      CAST((
+        SELECT COUNT(article_id) AS comment_count 
+        FROM comments 
+        WHERE comments.article_id = articles.article_id) AS INTEGER)
+      FROM articles
+      WHERE topic = $1 
+      ORDER BY created_at DESC`, [articleTopic]
     )
     .then(({ rows }) => {
+        console.log(rows, "<-- rows in models")
       return rows;
     });
 };
+exports.fetchArticleTopic = (articleTopic) => {
+    return db
+      .query(
+        `SELECT * FROM articles WHERE topic = $1`,
+        [articleTopic]
+      )
+      .then(({ rows }) => {
+        if (rows.length === 0) {
+          return Promise.reject({ status: 404, message: "Not Found" });
+        }
+        console.log(rows, "<-- rows in models")
+        return rows;
+      });
+  };
+//
 exports.fetchArticleComments = (article_id) => {
   return db
     .query(
@@ -81,8 +113,7 @@ exports.removeComment = (comment_id) => {
     });
 };
 exports.fetchUsers = () => {
-    return db.query("SELECT * FROM users").then(({ rows }) => {
-        console.log(rows)
-      return rows;
-    });
-  };
+  return db.query("SELECT * FROM users").then(({ rows }) => {
+    return rows;
+  });
+};

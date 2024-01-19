@@ -7,7 +7,8 @@ const {
   addComment,
   addVote,
   removeComment,
-  fetchUsers
+  fetchUsers,
+  fetchArticleTopic
 } = require("../models/topics.models");
 
 exports.getTopics = (request, response, next) => {
@@ -38,12 +39,25 @@ exports.getArticlesByID = (request, response, next) => {
       next(err);
     });
 };
+// exports.getArticles = (request, response, next) => {
+//   fetchArticles()
+//     .then((articles) => {
+//       response.status(200).send({ articles });
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 exports.getArticles = (request, response, next) => {
-  fetchArticles()
+  const articleTopic = request.query.topic;
+  console.log(articleTopic, "<--topic in controller")
+  fetchArticles(articleTopic)
     .then((articles) => {
+      console.log(articles, "<--articles in controller")
       response.status(200).send({ articles });
     })
     .catch((err) => {
+      console.log(err, "<-- err in controller")
       next(err);
     });
 };
@@ -91,7 +105,7 @@ exports.getUsers = (request, response, next) => {
       response.status(200).send({ users });
     })
     .catch((err) => {
-      console.log(err)
       next(err);
     });
 };
+
